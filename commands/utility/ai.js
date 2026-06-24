@@ -5,11 +5,12 @@ const ollama = require("ollama").default;
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName('ai')
+    .setName('chat')
     .setDescription('replies from a chat bot.')
-    .addStringOption((option) => option.setName('message').setDescription('message to send to chat bot').setRequired(true)),
+    .addStringOption((option) => option.setName('message').setDescription('chat with the bot').setRequired(true)),
     async execute(interaction){
-        await interaction.reply('thinking...')
+        console.info(`Command <chat> invoked by ${interaction.user.username}`)
+        await interaction.reply('thinking...') // Show function is running
         const response = await ollama.chat({
             model:'qwen2.5:3b',
             messages: [
@@ -19,8 +20,10 @@ module.exports = {
                 {
                     role:'user', content: interaction.options.getString('message')
                 }],
-                stream: true
+                stream: true // Enable streaming for in real time generation
         });
+
+        // Edits the mesage for every part of response generated
         var msg = '';
         for await (const part of response) {
             msg += part.message.content;
